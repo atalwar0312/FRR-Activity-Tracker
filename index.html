@@ -5,283 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>FRR Forex — RM Lead Activity Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💱</text></svg>">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
-  :root {
-    --orange-main: #E57917; --orange-dark: #B35E12; --orange-light: #FAEBDC;
-    --dark-text: #3A2113; --grey-text: #595959;
-    --green: #1E7E34; --blue: #1F4E78; --red: #9C0006; --yellow: #9C6500;
-  }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Calibri, Arial, sans-serif; background: #f7f3ee; color: var(--dark-text); }
-
-  #gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--orange-main), var(--orange-dark)); }
-  #gate .card { background: white; border-radius: 14px; padding: 40px 36px; width: 100%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center; }
-  #gate .card img { width: 120px; margin-bottom: 18px; }
-  #gate h1 { font-size: 18px; margin: 0 0 6px; color: var(--orange-dark); }
-  #gate p { font-size: 13px; color: var(--grey-text); margin: 0 0 20px; }
-  #gate input { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 12px; }
-  #gate button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--orange-main); color: white; font-size: 15px; font-weight: 600; cursor: pointer; }
-  #gate button:hover { background: var(--orange-dark); }
-  #gate .status { font-size: 12px; margin-top: 12px; min-height: 16px; color: var(--grey-text); }
-  #gate .status.error { color: var(--red); font-weight: 600; }
-  #gate .debug {
-    margin-top: 14px; padding: 10px; background: #fff4f4; border: 1px solid #f3caca;
-    border-radius: 8px; font-size: 11px; text-align: left; color: #7a1a1a;
-    max-height: 140px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; display: none;
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: -apple-system, "Segoe UI", Roboto, Calibri, Arial, sans-serif;
+    background: linear-gradient(135deg, #E57917, #B35E12);
   }
-
-  #dashboard { display: none; }
-  header { background: var(--orange-main); color: white; padding: 18px 28px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  header img { height: 44px; }
-  header h1 { font-size: 20px; margin: 0; font-weight: 700; }
-  header .meta { margin-left: auto; font-size: 12px; opacity: 0.9; }
-  main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 28px; }
-  .kpi-card { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-top: 4px solid var(--orange-main); }
-  .kpi-card .label { font-size: 12px; color: var(--grey-text); text-transform: uppercase; letter-spacing: 0.04em; }
-  .kpi-card .value { font-size: 28px; font-weight: 700; color: var(--orange-dark); margin-top: 4px; }
-  .kpi-card.converted { border-top-color: var(--green); } .kpi-card.converted .value { color: var(--green); }
-  .kpi-card.docsent { border-top-color: var(--blue); } .kpi-card.docsent .value { color: var(--blue); }
-  .kpi-card.notconverted { border-top-color: var(--red); } .kpi-card.notconverted .value { color: var(--red); }
-  .kpi-card.inprogress { border-top-color: var(--yellow); } .kpi-card.inprogress .value { color: var(--yellow); }
-  section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-  section h2 { font-size: 15px; margin: 0 0 16px; color: var(--orange-dark); }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid #eee; }
-  th { color: var(--grey-text); font-weight: 600; font-size: 12px; text-transform: uppercase; }
-  tr:nth-child(even) { background: var(--orange-light); }
-  td.num, th.num { text-align: center; }
-  canvas { max-height: 280px; }
-  .refresh-note { text-align: center; font-size: 12px; color: var(--grey-text); margin-top: 8px; }
-  .error-banner { background: #FFC7CE; color: var(--red); padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
+  .card {
+    background: white; border-radius: 16px; padding: 44px 40px; width: 100%; max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center;
+  }
+  .card img { width: 140px; margin-bottom: 20px; }
+  h1 { font-size: 20px; margin: 0 0 8px; color: #B35E12; }
+  p { font-size: 13px; color: #595959; margin: 0 0 28px; line-height: 1.5; }
+  a.button {
+    display: block; padding: 14px; border-radius: 10px; background: #E57917; color: white;
+    font-size: 15px; font-weight: 700; text-decoration: none;
+  }
+  a.button:hover { background: #B35E12; }
+  .note { margin-top: 18px; font-size: 11px; color: #8a8a8a; }
 </style>
 </head>
 <body>
-
-<div id="gate">
   <div class="card">
     <img src="assets/frr_logo.png" alt="FRR Forex" />
     <h1>RM Lead Activity Dashboard</h1>
-    <p>Enter your access code to view live stats.</p>
-    <input type="password" id="codeInput" placeholder="Access code" autocomplete="off" />
-    <button id="submitCode">View Dashboard</button>
-    <div class="status" id="gateStatus"></div>
-    <div class="debug" id="gateDebug"></div>
+    <p>Live lead &amp; conversion stats for the FRR Forex team.<br>Requires your @frrforex.in Google account.</p>
+    <a class="button" href="https://script.google.com/a/macros/frrforex.in/s/AKfycbz5n3ddpH74flfBmPgITJtjtj5Vm3b5yfze8gXVGaF9FOvyKzZQNZaaCKADtkAMsumE/exec" target="_blank" rel="noopener">
+      Open Live Dashboard →
+    </a>
+    <div class="note">You'll need to be signed into your FRR Google account to view it.</div>
   </div>
-</div>
-
-<div id="dashboard">
-  <header>
-    <img src="assets/frr_logo.png" alt="FRR Forex" />
-    <h1>RM Lead Activity Dashboard</h1>
-    <div class="meta" id="lastUpdated"></div>
-  </header>
-  <main>
-    <div id="errorBanner" class="error-banner" style="display:none;"></div>
-    <div class="kpi-grid" id="kpiGrid"></div>
-    <section>
-      <h2>Lead Trend (last 30 days)</h2>
-      <canvas id="trendChart"></canvas>
-    </section>
-    <section>
-      <h2>Per-RM Breakdown</h2>
-      <table id="rmTable">
-        <thead>
-          <tr><th>RM Name</th><th>Branch</th><th class="num">Total</th><th class="num">Converted</th>
-              <th class="num">Doc Sent</th><th class="num">Not Converted</th><th class="num">In Progress</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-    <p class="refresh-note">Auto-refreshes every 5 minutes. Data comes directly from the live Google Sheet.</p>
-  </main>
-</div>
-
-<script>
-  // ======= CONFIGURE THIS =======
-  const API_URL = "https://script.google.com/a/macros/frrforex.in/s/AKfycbz5n3ddpH74flfBmPgITJtjtj5Vm3b5yfze8gXVGaF9FOvyKzZQNZaaCKADtkAMsumE/exec";
-  // ================================
-
-  const REFRESH_MS = 5 * 60 * 1000;
-  let accessCode = null;
-  let chart = null;
-
-  const gate = document.getElementById("gate");
-  const dashboard = document.getElementById("dashboard");
-  const gateStatus = document.getElementById("gateStatus");
-  const gateDebug = document.getElementById("gateDebug");
-  const errorBanner = document.getElementById("errorBanner");
-
-  document.getElementById("submitCode").addEventListener("click", trySubmit);
-  document.getElementById("codeInput").addEventListener("keydown", function (e) {
-    if (e.key === "Enter") trySubmit();
-  });
-
-  function showDebug(text) {
-    gateDebug.textContent = text;
-    gateDebug.style.display = "block";
-  }
-
-  function trySubmit() {
-    const val = document.getElementById("codeInput").value.trim();
-    if (!val) return;
-    gateStatus.textContent = "Checking...";
-    gateStatus.className = "status";
-    gateDebug.style.display = "none";
-
-    fetchData(val)
-      .then(function (data) {
-        if (data.ok) {
-          accessCode = val;
-          sessionStorage.setItem("frr_code", val);
-          gate.style.display = "none";
-          dashboard.style.display = "block";
-          render(data);
-          startAutoRefresh();
-        } else {
-          gateStatus.textContent = "Incorrect access code (server said: " + (data.error || "no reason given") + ").";
-          gateStatus.className = "status error";
-        }
-      })
-      .catch(function (err) {
-        gateStatus.textContent = "Couldn't load the dashboard. See details below.";
-        gateStatus.className = "status error";
-        showDebug(
-          "API_URL: " + API_URL + "\n" +
-          "Error: " + (err && err.message ? err.message : String(err)) + "\n" +
-          "Fetch attempt: " + (err && err.attempt ? err.attempt : "unknown")
-        );
-      });
-  }
-
-  // Tries plain fetch() first (works if Apps Script sends CORS headers).
-  // If that throws for any reason, falls back to a JSONP <script> tag load
-  // (works even without CORS headers, since script tags aren't subject to
-  // the same restriction). Whichever succeeds first wins.
-  function fetchData(code) {
-    if (API_URL.indexOf("PASTE_YOUR") === 0) {
-      return Promise.reject(Object.assign(new Error("API_URL has not been set in index.html yet."), { attempt: "config" }));
-    }
-
-    const plainUrl = API_URL + (API_URL.indexOf("?") === -1 ? "?" : "&") + "code=" + encodeURIComponent(code);
-
-    return fetch(plainUrl)
-      .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
-      })
-      .catch(function (fetchErr) {
-        // fall back to JSONP
-        return jsonpRequest(plainUrl).catch(function (jsonpErr) {
-          const combined = new Error(
-            "fetch() failed: " + fetchErr.message + " | JSONP fallback also failed: " + jsonpErr.message
-          );
-          combined.attempt = "both fetch and JSONP";
-          throw combined;
-        });
-      });
-  }
-
-  function jsonpRequest(baseUrl) {
-    return new Promise(function (resolve, reject) {
-      const callbackName = "frrCallback_" + Date.now();
-      const timeout = setTimeout(function () {
-        cleanup();
-        reject(Object.assign(new Error("timed out after 15s"), { attempt: "jsonp" }));
-      }, 15000);
-
-      function cleanup() {
-        clearTimeout(timeout);
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-      }
-
-      window[callbackName] = function (data) {
-        cleanup();
-        resolve(data);
-      };
-
-      const script = document.createElement("script");
-      script.src = baseUrl + "&callback=" + callbackName;
-      script.onerror = function () {
-        cleanup();
-        reject(Object.assign(new Error("script tag failed to load (network/CORP block)"), { attempt: "jsonp" }));
-      };
-      document.body.appendChild(script);
-    });
-  }
-
-  function render(data) {
-    errorBanner.style.display = "none";
-    document.getElementById("lastUpdated").textContent =
-      "Updated " + new Date(data.generatedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " IST";
-
-    const k = data.kpis;
-    document.getElementById("kpiGrid").innerHTML = [
-      card("Total Leads", k.totalLeads, ""),
-      card("Converted", k.converted, "converted"),
-      card("Doc Sent", k.docSent, "docsent"),
-      card("Lead Not Converted", k.leadNotConverted, "notconverted"),
-      card("In Progress", k.inProgress, "inprogress"),
-      card("Conversion Rate", (Math.round(k.conversionRate * 1000) / 10) + "%", ""),
-    ].join("");
-
-    document.querySelector("#rmTable tbody").innerHTML = data.rmBreakdown.map(function (rm) {
-      return "<tr><td>" + esc(rm.rmName) + "</td><td>" + esc(rm.branch) + "</td>" +
-        "<td class='num'>" + rm.totalLeads + "</td><td class='num'>" + rm.converted + "</td>" +
-        "<td class='num'>" + rm.docSent + "</td><td class='num'>" + rm.leadNotConverted + "</td>" +
-        "<td class='num'>" + rm.inProgress + "</td></tr>";
-    }).join("");
-
-    renderChart(data.history);
-  }
-
-  function card(label, value, cls) {
-    return "<div class='kpi-card " + cls + "'><div class='label'>" + label + "</div><div class='value'>" + value + "</div></div>";
-  }
-
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
-  }
-
-  function renderChart(history) {
-    const labels = history.map(function (h) { return h.date; });
-    const totals = history.map(function (h) { return h.totalLeads; });
-    const converted = history.map(function (h) { return h.converted; });
-    const ctx = document.getElementById("trendChart").getContext("2d");
-    if (chart) chart.destroy();
-    chart = new Chart(ctx, {
-      type: "line",
-      data: { labels: labels, datasets: [
-        { label: "Total Leads", data: totals, borderColor: "#E57917", backgroundColor: "rgba(229,121,23,0.1)", tension: 0.3, fill: true },
-        { label: "Converted", data: converted, borderColor: "#1E7E34", backgroundColor: "rgba(30,126,52,0.1)", tension: 0.3, fill: true },
-      ]},
-      options: { responsive: true, plugins: { legend: { position: "bottom" } }, scales: { y: { beginAtZero: true } } },
-    });
-  }
-
-  function startAutoRefresh() {
-    setInterval(function () {
-      fetchData(accessCode).then(function (data) {
-        if (data.ok) render(data);
-        else { errorBanner.textContent = "Couldn't refresh — will retry in 5 minutes."; errorBanner.style.display = "block"; }
-      }).catch(function () {
-        errorBanner.textContent = "Couldn't refresh — will retry in 5 minutes.";
-        errorBanner.style.display = "block";
-      });
-    }, REFRESH_MS);
-  }
-
-  (function tryStoredCode() {
-    const stored = sessionStorage.getItem("frr_code");
-    if (stored) {
-      document.getElementById("codeInput").value = stored;
-      trySubmit();
-    }
-  })();
-</script>
 </body>
 </html>
