@@ -240,8 +240,37 @@
     if (API_URL.indexOf("PASTE_YOUR") === 0) {
       return Promise.resolve({ ok: false, error: "API_URL not configured" });
     }
-    const url = API_URL + (API_URL.indexOf("?") === -1 ? "?" : "&") + "code=" + encodeURIComponent(code);
-    return fetch(url).then(function (r) { return r.json(); });
+    // JSONP request: loads data via a <script> tag instead of fetch(), which
+    // sidesteps browser CORS restrictions that can block cross-domain fetch()
+    // calls to Apps Script web apps.
+    return new Promise(function (resolve, reject) {
+      const callbackName = "frrCallback_" + Date.now();
+      const timeout = setTimeout(function () {
+        cleanup();
+        reject(new Error("Request timed out"));
+      }, 15000);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        delete window[callbackName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[callbackName] = function (data) {
+        cleanup();
+        resolve(data);
+      };
+
+      const url = API_URL + (API_URL.indexOf("?") === -1 ? "?" : "&") +
+        "code=" + encodeURIComponent(code) + "&callback=" + callbackName;
+      const script = document.createElement("script");
+      script.src = url;
+      script.onerror = function () {
+        cleanup();
+        reject(new Error("Script load failed"));
+      };
+      document.body.appendChild(script);
+    });
   }
 
   function render(data) {
